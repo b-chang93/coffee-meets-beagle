@@ -1,0 +1,29 @@
+{
+  "name": "coffee-meets-beagle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b-chang93/coffee-meets-beagle.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/b-chang93/coffee-meets-beagle/issues"
+  },
+  "homepage": "https://github.com/b-chang93/coffee-meets-beagle#readme",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.7",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
