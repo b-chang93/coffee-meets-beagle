@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const Genders = Object.freeze({
     Male: 'male',
@@ -11,7 +12,8 @@ const dogSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        minLength: 1
     },
     email: {
         type: String, 
@@ -36,44 +38,70 @@ const dogSchema = new mongoose.Schema({
             }
         }
     },
+    description: {
+        type: String
+    },
     gender: {
         type: String,
-        required: true,
         enum: Object.values(Genders)
     },
     age: {
-        type: Number, 
-        required: true
+        type: Number
     },
     spade: {
-        type: Boolean,
-        required: true, 
+        type: Boolean
     },
     likes: {
-        type: Number
+
     },
     liked: {
 
     },
     dislikes: {
 
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
 
 dogSchema.statics.findByCredentials = async (email, password) => {
-    const dog = await dog.findOne({ email })
-
+    const dog = await Dog.findOne({ email });
+    
     if (!dog) {
-        throw new Error('Unable to login')
+        throw new Error('Unable to login');
     }
 
-    const isMatch = await bcrypt.compare(password, dog.password)
+    const isMatch = await bcrypt.compare(password, dog.password);
 
     if(!isMatch) {
-        throw new Error('Unable to login')
+        throw new Error('Unable to login');
     }
 
-    return dog
+    return dog;
+};
+
+dogSchema.methods.generateAuthToken = async function() {
+    const dog = this;
+    const token = jwt.sign({ _id: dog._id.toString() }, 'mytempsecret');
+
+    // const data = jwt.verify(token, 'mytempsecret')
+    dog.tokens = dog.tokens.concat({ token });
+    await dog.save();
+    return token;
+};
+
+dogSchema.methods.toJSON = function() {
+    const dog = this;
+    const dogObject = dog.toObject();
+
+    delete dogObject.password;
+    delete dogObject.tokens;
+
+    return dogObject;
 };
 
 Object.assign(dogSchema.statics, {
@@ -91,6 +119,6 @@ dogSchema.pre('save', async function(next) {
     next();
 });
 
-const dog = mongoose.model('dog', dogSchema);
+const Dog = mongoose.model('Dog', dogSchema);
 
-module.exports = dog;
+module.exports = Dog;
